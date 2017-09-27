@@ -14,7 +14,7 @@ import com.rootlet.game.sprites.Tube;
 
 public class PlayState extends State {
 
-    public static final int TUBE_SPACING = 125;
+    public static final int TUBE_SPACING = 135;
     public static final int TUBE_COUNT = 4;
     private Bird bird;
     private Texture bg;
@@ -23,7 +23,7 @@ public class PlayState extends State {
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
-        bird = new Bird(50, 300);
+        bird = new Bird(60, 300);
         camera.setToOrtho(false, FlappyDemo.WIDTH / 2, FlappyDemo.HEIGTH / 2);
         bg = new Texture("bg.png");
         
@@ -47,11 +47,15 @@ public class PlayState extends State {
         bird.update(dt);
         camera.position.x = bird.getPosition().x + 80;
 
-        for (Tube tube : tubes) {
+        for (int i = 0; i < tubes.size; i++){
+            Tube tube = tubes.get(i);
             if (camera.position.x - (camera.viewportWidth / 2) > tube.getPosTopTube().x
                     + tube.getTopTube().getWidth()) {
                 tube.reposition(tube.getPosTopTube().x + ((Tube.TUBE_WIDTH + TUBE_SPACING) * TUBE_COUNT));
             }
+
+            if (tube.collides(bird.getBounds()))
+                gsm.set(new PlayState(gsm));
         }
         camera.update();
     }
@@ -71,6 +75,9 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-
+        bg.dispose();
+        bird.dispose();
+        for (Tube tube : tubes) tube.dispose();
+        System.out.println("PlayState Dispose");
     }
 }
